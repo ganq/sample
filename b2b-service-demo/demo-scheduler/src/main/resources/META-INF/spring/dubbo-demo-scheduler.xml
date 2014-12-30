@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+	<!--要调用的BEAN -->
+	<bean id="userScheduler" class="com.mysoft.b2b.demo.scheduler.UserScheduler">
+		<property name="userService" ref="userService" />
+	</bean>
+
+	<!--定义调用对象和调用对象的方法 -->
+	<bean id="userJobtask" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="userScheduler" />
+		</property>
+		<property name="targetMethod">
+			<value>saveUserScheduler</value>
+		</property>
+	</bean>
+
+	<!--定义触发时间 -->
+	<bean id="userJobTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail">
+			<ref bean="userJobtask" />
+		</property>
+		<!--cron表达式 -->
+		<property name="cronExpression">
+			<value>0 0 */1 * * ?</value>
+		</property>
+	</bean>
+
+	<!-- 总管理类 -->
+	<bean id="startQuertz" lazy-init="false" autowire="no" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="triggers">
+			<list>
+				<ref bean="userJobTrigger" />
+			</list>
+		</property>
+	</bean>
+
+
+
+</beans>

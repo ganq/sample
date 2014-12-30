@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mysoft.b2b.demo.mapper.UserMapper">
+	<resultMap id="userResult" type="User">
+		<id property="userId" column="user_id" />
+		<result property="userName" column="user_name" />
+		<result property="mobile" column="mobile" />
+		<result property="address" column="address" />
+
+		<association property="company" javaType="Company">
+			<id property="companyId" column="company_id" />
+			<result property="companyName" column="company_name" />
+			<result property="address" column="company_address" />
+		</association>
+	</resultMap>
+	<!-- 新增用户对象 -->
+	<insert id="saveUser" parameterType="User" keyProperty="userId">
+		insert into
+		B2B_DEMO_USER
+		(USER_ID,USER_NAME,MOBILE,ADDRESS,COMPANY_Id) values
+		(#{userId},#{userName},#{mobile},#{address},#{company.companyId})
+	</insert>
+
+	<select id="getUserList" resultMap="userResult">
+		select user_id, user_name, mobile, user.address address, company.company_id
+		company_id, company_name, company.address company_address from B2B_DEMO_USER user, B2B_DEMO_COMPANY company where
+		user.company_id = company.company_id limit 0,50
+	</select>
+
+</mapper>
